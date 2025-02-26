@@ -12,8 +12,17 @@ export interface CompleteMultipartRequest {
   parts: CompletedPart[];
 }
 
-export interface Integration {
-  lambdaIntegration: LambdaIntegration;
+export interface Handler {
+  id: string;
   resourceName: string;
-  method: string;
+  fileName?: string;
+  method?: string;
+  nestedHandlers?: Handler[];
+}
+
+export interface Integration {
+  resourceName: string;
+  lambdaIntegration?: LambdaIntegration;
+  method?: string;
+  nestedIntegrations?: Integration[];
 }

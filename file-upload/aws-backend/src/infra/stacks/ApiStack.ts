@@ -14,17 +14,15 @@ export class ApiStack extends Stack {
 
     const api = new RestApi(this, props.id);
     props.integrations.forEach((integration) => {
-      const resources = integration.resourceName.split('/');
-      if (resources.length > 2) {
-        console.log('Invalid resource path - Depth should not be more than 2');
-        return;
-      }
-      const uploadResource = api.root.addResource(resources[0]);
-      if (resources.length > 1) {
-        const resource = uploadResource.addResource(resources[1]);
-        resource.addMethod(integration.method, integration.lambdaIntegration);
+      const uploadResource = api.root.addResource(integration.resourceName);
+      if (integration.nestedIntegrations?.length) {
+        for (let index = 0; index < integration.nestedIntegrations.length; index++) {
+          const nestedIntegration = integration.nestedIntegrations[index];
+          const resource = uploadResource.addResource(nestedIntegration.resourceName);
+          resource.addMethod(nestedIntegration.method ?? '', nestedIntegration.lambdaIntegration);
+        }
       } else {
-        uploadResource.addMethod(integration.method, integration.lambdaIntegration);
+        uploadResource.addMethod(integration.method ?? '', integration.lambdaIntegration);
       }
     });
   }
