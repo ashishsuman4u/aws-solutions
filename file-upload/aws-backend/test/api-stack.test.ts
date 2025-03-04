@@ -8,9 +8,12 @@ test('API Created', () => {
   const app = new cdk.App();
   const lambda = new LambdaStack(app, 'uploadLambda', {
     bucketName: 'uploadBucket',
+    bucketArn: 'uploadBucket',
+    handlers: [{ id: 'test', resourceName: 'test', fileName: 'singleUploadHandler.ts', method: 'POST' }],
   });
   const stack = new ApiStack(app, 'uploadapi', {
-    lambdaIntegration: lambda.uploadLambdaIntegration,
+    integrations: lambda.integrations,
+    id: 'uploadapi',
   });
 
   const api = stack.node.tryFindChild('uploadapi');

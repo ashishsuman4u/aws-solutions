@@ -1,6 +1,7 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import { Storage } from '../lib/storage';
+import { getApiResponse } from '../lib/common';
 
 const client = new S3Client({
   region: 'us-east-1',
@@ -14,15 +15,9 @@ const handler = async (event: APIGatewayProxyEvent, context: Context) => {
 
     const presignedUrl = await storage.createMultipartPresignedUrl(resBody.fileName, resBody.multipartRequest);
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ uploadUrls: presignedUrl }),
-    };
+    return getApiResponse(200, { uploadUrls: presignedUrl });
   } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify(error),
-    };
+    return getApiResponse(500, error);
   }
 };
 

@@ -5,6 +5,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Construct } from 'constructs';
 import { join } from 'path';
 import { Handler, Integration } from '../../types';
+import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 interface LambdaStackProps extends StackProps {
   handlers: Handler[];
@@ -16,7 +17,7 @@ export class LambdaStack extends Stack {
   public readonly integrations: Integration[] = [];
   constructor(scope: Construct, id: string, props: LambdaStackProps) {
     super(scope, id, props);
-
+    console.log(props.bucketArn);
     for (let index = 0; index < props.handlers.length; index++) {
       const handler = props.handlers[index];
       if (handler.nestedHandlers?.length) {
@@ -29,9 +30,22 @@ export class LambdaStack extends Stack {
             entry: join(__dirname, '..', '..', 'services', nestedHandler.fileName ?? ''),
             environment: {
               BUCKET_NAME: props.bucketName,
-              BUCKET_ARN: props.bucketArn,
             },
           });
+          uploadLambda.addToRolePolicy(
+            new PolicyStatement({
+              effect: Effect.ALLOW,
+              actions: ['s3:ListAllMyBuckets', 's3:ListBucket'],
+              resources: [props.bucketArn],
+            })
+          );
+          uploadLambda.addToRolePolicy(
+            new PolicyStatement({
+              effect: Effect.ALLOW,
+              actions: ['s3:PutObject', 's3:PutObjectAcl', 's3:GetObject', 's3:GetObjectAcl'],
+              resources: [`${props.bucketArn}/*`],
+            })
+          );
           nestedIntegration.push({
             lambdaIntegration: new LambdaIntegration(uploadLambda),
             resourceName: nestedHandler.resourceName,
@@ -49,9 +63,22 @@ export class LambdaStack extends Stack {
           entry: join(__dirname, '..', '..', 'services', handler.fileName ?? ''),
           environment: {
             BUCKET_NAME: props.bucketName,
-            BUCKET_ARN: props.bucketArn,
           },
         });
+        uploadLambda.addToRolePolicy(
+          new PolicyStatement({
+            effect: Effect.ALLOW,
+            actions: ['s3:ListAllMyBuckets', 's3:ListBucket'],
+            resources: [props.bucketArn],
+          })
+        );
+        uploadLambda.addToRolePolicy(
+          new PolicyStatement({
+            effect: Effect.ALLOW,
+            actions: ['s3:PutObject', 's3:PutObjectAcl', 's3:GetObject', 's3:GetObjectAcl'],
+            resources: [`${props.bucketArn}/*`],
+          })
+        );
         this.integrations.push({
           lambdaIntegration: new LambdaIntegration(uploadLambda),
           resourceName: handler.resourceName,

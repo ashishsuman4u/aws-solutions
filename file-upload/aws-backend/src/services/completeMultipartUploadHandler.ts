@@ -1,6 +1,7 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import { Storage } from '../lib/storage';
+import { getApiResponse } from '../lib/common';
 
 const client = new S3Client({
   region: 'us-east-1',
@@ -13,15 +14,9 @@ const handler = async (event: APIGatewayProxyEvent, context: Context) => {
     const resBody = JSON.parse(event.body ? event.body : '');
     const response = await storage.completeMultipartUpload(resBody);
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ response }),
-    };
+    return getApiResponse(200, response);
   } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify(error),
-    };
+    return getApiResponse(500, error);
   }
 };
 

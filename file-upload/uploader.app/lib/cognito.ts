@@ -1,5 +1,13 @@
 import { redirect } from 'next/navigation';
-import { signUp, confirmSignUp, signIn, signOut, resendSignUpCode, getCurrentUser } from 'aws-amplify/auth';
+import {
+  signUp,
+  confirmSignUp,
+  signIn,
+  signOut,
+  resendSignUpCode,
+  getCurrentUser,
+  fetchAuthSession,
+} from 'aws-amplify/auth';
 import { getErrorMessage } from '@/utils/get-error-message';
 
 export async function handleSignUp(prevState: string | undefined, formData: FormData) {
@@ -92,4 +100,8 @@ export async function handleSignOut() {
     console.log(getErrorMessage(error));
   }
   redirect('/');
+}
+
+export async function getCurrentSession() {
+  return fetchAuthSession();
 }

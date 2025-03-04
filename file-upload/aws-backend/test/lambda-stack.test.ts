@@ -7,6 +7,8 @@ test('Lambda Created', () => {
   const app = new cdk.App();
   const stack = new LambdaStack(app, 'uploadLambda', {
     bucketName: 'uploadBucket',
+    bucketArn: 'uploadBucket',
+    handlers: [{ id: 'uploadLambda', resourceName: 'test', fileName: 'singleUploadHandler.ts', method: 'POST' }],
   });
 
   const lambda = stack.node.tryFindChild('uploadLambda');

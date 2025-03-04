@@ -11,6 +11,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { CompleteMultipartRequest, MultipartUploadRequest } from '../types';
+import { FILE_TYPE } from './common';
 
 export class Storage {
   client: S3Client;
@@ -20,7 +21,7 @@ export class Storage {
     this.bucketName = bucketName;
   }
 
-  startMultipartUpload = async (fileName: string, fileType: FILE_TYPE) => {
+  startMultipartUpload = async (fileName: string, fileType: string) => {
     const params: CreateMultipartUploadCommandInput = {
       Bucket: this.bucketName,
       Key: fileName,

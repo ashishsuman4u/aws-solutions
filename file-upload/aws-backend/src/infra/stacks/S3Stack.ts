@@ -1,7 +1,8 @@
 import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
-import { Bucket, IBucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
+import { Bucket, HttpMethods, IBucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { getSuffixFromStack } from '../Utils';
+import { S3 } from '@aws-sdk/client-s3';
 
 export class S3Stack extends Stack {
   public readonly uploadBucket: IBucket;
@@ -18,6 +19,13 @@ export class S3Stack extends Stack {
         ignorePublicAcls: false,
         restrictPublicBuckets: false,
       },
+      cors: [
+        {
+          allowedMethods: [HttpMethods.PUT, HttpMethods.HEAD, HttpMethods.GET],
+          allowedOrigins: ['http://localhost:3000'],
+          allowedHeaders: ['*'],
+        },
+      ],
     });
 
     new CfnOutput(this, 'uploadBucketName', {
