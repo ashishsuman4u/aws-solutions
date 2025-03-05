@@ -6,6 +6,11 @@ export interface MultipartUploadRequest {
   uploadId?: string;
 }
 
+export interface CompletedPart {
+  ETag: string;
+  PartNumber: number;
+}
+
 const client = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
 });
@@ -29,7 +34,7 @@ export async function handleSingleUpload(file: File | null, token: string | unde
       },
       {
         headers: {
-          'Content-Type': 'application/octet-stream',
+          'Content-Type': file.type,
         },
       }
     );
@@ -40,6 +45,7 @@ export async function handleSingleUpload(file: File | null, token: string | unde
 
 export async function handleMultipartUpload(file: File | null, token: string | undefined) {
   let fileType = 'IMAGE';
+  const chunkSize = 10000000;
   if (file) {
     if (isVideo(file.name)) {
       fileType = 'VIDEO';
@@ -57,11 +63,11 @@ export async function handleMultipartUpload(file: File | null, token: string | u
     );
     const uploadId = uploadStartResponse?.data?.uploadId;
 
-    const parts = file.size / 10000000 + (file.size % 10000000 > 0 ? 1 : 0);
+    const parts = Math.ceil(file.size / chunkSize);
     const multipartRequest: MultipartUploadRequest[] = [];
     for (let index = 0; index < parts; index++) {
       multipartRequest.push({
-        partNumber: index,
+        partNumber: index + 1,
         uploadId,
       });
     }
@@ -76,26 +82,54 @@ export async function handleMultipartUpload(file: File | null, token: string | u
       }
     );
 
-    const presignedUrls = presignedUrlsResponse.data?.presignedUrls;
-
+    console.log('presignedUrlsResponse', presignedUrlsResponse);
+    const presignedUrls = presignedUrlsResponse.data?.uploadUrls;
     console.log('presignedUrls', presignedUrls);
 
-    // for (let index = 0; index < presignedUrls.length; index++) {
-    //   const presignedUrl = presignedUrls[index];
-    //   const response = await client.put(
-    //     presignedUrl.data.uploadUrls,
-    //     {
-    //       data: file,
-    //     },
-    //     {
-    //       headers: {
-    //         'Content-Type': 'application/octet-stream',
-    //         Authorization: token,
-    //       },
-    //     }
-    //   );
-    // }
+    const uploadPromises = [];
+    for (let index = 0; index < parts; index++) {
+      const start = index * chunkSize;
+      const end = Math.min(start + chunkSize, file.size);
+      const chunk = file.slice(start, end);
+      console.log(chunk.size);
+      const presignedUrl = presignedUrls[index];
+      uploadPromises.push(
+        client.put(
+          presignedUrl,
+          {
+            data: chunk,
+          },
+          {
+            headers: {
+              'Content-Type': file.type,
+            },
+          }
+        )
+      );
+    }
+    const uploadResponses = await Promise.all(uploadPromises);
+    console.log(uploadResponses);
 
-    return response;
+    const partsResponse: CompletedPart[] = [];
+    uploadResponses.forEach((response, i) => {
+      partsResponse.push({
+        ETag: response.headers.etag.replaceAll('"', ''),
+        PartNumber: i + 1,
+      });
+    });
+
+    console.log('partsResponse - ', partsResponse);
+
+    const uploadCompleteResponse = await client.post(
+      '/multipart/complete',
+      { fileName: file.name, uploadId, parts: partsResponse },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(uploadCompleteResponse);
+    return uploadCompleteResponse;
   }
 }

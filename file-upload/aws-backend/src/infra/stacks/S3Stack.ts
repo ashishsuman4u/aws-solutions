@@ -24,6 +24,7 @@ export class S3Stack extends Stack {
           allowedMethods: [HttpMethods.PUT, HttpMethods.HEAD, HttpMethods.GET],
           allowedOrigins: ['http://localhost:3000'],
           allowedHeaders: ['*'],
+          exposedHeaders: ['Etag'],
         },
       ],
     });
