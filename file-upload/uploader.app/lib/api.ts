@@ -94,17 +94,11 @@ export async function handleMultipartUpload(file: File | null, token: string | u
       console.log(chunk.size);
       const presignedUrl = presignedUrls[index];
       uploadPromises.push(
-        client.put(
-          presignedUrl,
-          {
-            data: chunk,
+        client.put(presignedUrl, chunk, {
+          headers: {
+            'Content-Type': file.type,
           },
-          {
-            headers: {
-              'Content-Type': file.type,
-            },
-          }
-        )
+        })
       );
     }
     const uploadResponses = await Promise.all(uploadPromises);
