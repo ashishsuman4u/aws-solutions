@@ -36,8 +36,10 @@ export default function Login() {
                   <label className="text-gray-800 text-sm mb-2 block">User name</label>
                   <div className="relative flex items-center">
                     <input
-                      {...register('username', { required: true })}
-                      className="w-full text-sm text-gray-800 border border-gray-300 pl-4 pr-10 py-3 rounded-lg outline-blue-600"
+                      {...register('username', { required: 'Please enter your email' })}
+                      className={`w-full text-sm text-gray-800 border border-gray-300 pl-4 pr-10 py-3 rounded-lg  ${
+                        errors && errors.username ? 'outline-red-600' : 'outline-blue-600'
+                      }`}
                       placeholder="Enter user name"
                     />
                     <svg
@@ -55,13 +57,17 @@ export default function Login() {
                     </svg>
                   </div>
                 </div>
+
+                {errors && errors.username && <p className="text-red-500 text-sm">{errors.username?.message}</p>}
                 <div>
                   <label className="text-gray-800 text-sm mb-2 block">Password</label>
                   <div className="relative flex items-center">
                     <input
                       type="password"
-                      {...register('password', { required: true })}
-                      className="w-full text-sm text-gray-800 border border-gray-300 pl-4 pr-10 py-3 rounded-lg outline-blue-600"
+                      {...register('password', { required: 'Please enter your password' })}
+                      className={`w-full text-sm text-gray-800 border border-gray-300 pl-4 pr-10 py-3 rounded-lg  ${
+                        errors && errors.password ? 'outline-red-600' : 'outline-blue-600'
+                      }`}
                       placeholder="Enter password"
                     />
                     <svg
@@ -78,6 +84,7 @@ export default function Login() {
                     </svg>
                   </div>
                 </div>
+                {errors && errors.password && <p className="text-red-500 text-sm">{errors.password?.message}</p>}
 
                 <div className="!mt-8">
                   <button

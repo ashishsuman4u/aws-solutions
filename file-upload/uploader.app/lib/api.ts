@@ -27,17 +27,11 @@ export async function handleSingleUpload(file: File | null, token: string | unde
       }
     );
 
-    const response = await client.put(
-      presignedUrl.data.uploadUrls,
-      {
-        data: file,
+    const response = await client.put(presignedUrl.data.uploadUrls, file, {
+      headers: {
+        'Content-Type': file.type,
       },
-      {
-        headers: {
-          'Content-Type': file.type,
-        },
-      }
-    );
+    });
 
     return response;
   }
