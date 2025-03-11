@@ -8,6 +8,7 @@ import { handleMultipartUpload, handleSingleUpload } from '@/lib/api';
 import { toast } from 'sonner';
 import { AxiosResponse } from 'axios';
 import { isImage, isPdf, isVideo } from '@/lib/utils';
+import { redirect } from 'next/navigation';
 
 export default function Upload() {
   type FormInput = {
@@ -48,6 +49,9 @@ export default function Upload() {
   useEffect(() => {
     async function fetchUser() {
       const response = await getLoggedInUser();
+      if (!response) {
+        redirect('/');
+      }
       setUser(response);
     }
     fetchUser();
