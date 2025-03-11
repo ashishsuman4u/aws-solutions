@@ -28,7 +28,6 @@ export default function Upload() {
       toast.error('Select a file to upload.');
       return;
     }
-    console.log(file);
     if (!isVideo(file.name) && !isImage(file.name) && !isPdf(file.name)) {
       toast.error('Only Image, Video and Pdf files are allowed.');
       return;
@@ -57,7 +56,6 @@ export default function Upload() {
     fetchUser();
   }, []);
   if (!user) return <div>Loading...</div>;
-  console.log(user);
   return (
     <form className="py-28" onSubmit={handleSubmit(onSubmit)}>
       <div className="bg-white text-gray-500 font-semibold text-base rounded max-w-md h-52 flex flex-col items-center justify-center cursor-pointer border-2 border-gray-300 border-dashed font-[sans-serif] mx-auto p-8">

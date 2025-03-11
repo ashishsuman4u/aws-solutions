@@ -65,7 +65,6 @@ export async function handleMultipartUpload(file: File | null, token: string | u
         uploadId,
       });
     }
-    console.log('multipartRequest', multipartRequest);
     const presignedUrlsResponse = await client.post(
       '/multipart/url',
       { fileName: file.name, multipartRequest },
@@ -76,16 +75,13 @@ export async function handleMultipartUpload(file: File | null, token: string | u
       }
     );
 
-    console.log('presignedUrlsResponse', presignedUrlsResponse);
     const presignedUrls = presignedUrlsResponse.data?.uploadUrls;
-    console.log('presignedUrls', presignedUrls);
 
     const uploadPromises = [];
     for (let index = 0; index < parts; index++) {
       const start = index * chunkSize;
       const end = Math.min(start + chunkSize, file.size);
       const chunk = file.slice(start, end);
-      console.log(chunk.size);
       const presignedUrl = presignedUrls[index];
       uploadPromises.push(
         client.put(presignedUrl, chunk, {
@@ -96,7 +92,6 @@ export async function handleMultipartUpload(file: File | null, token: string | u
       );
     }
     const uploadResponses = await Promise.all(uploadPromises);
-    console.log(uploadResponses);
 
     const partsResponse: CompletedPart[] = [];
     uploadResponses.forEach((response, i) => {
@@ -105,8 +100,6 @@ export async function handleMultipartUpload(file: File | null, token: string | u
         PartNumber: i + 1,
       });
     });
-
-    console.log('partsResponse - ', partsResponse);
 
     const uploadCompleteResponse = await client.post(
       '/multipart/complete',
@@ -117,7 +110,6 @@ export async function handleMultipartUpload(file: File | null, token: string | u
         },
       }
     );
-    console.log(uploadCompleteResponse);
     return uploadCompleteResponse;
   }
 }

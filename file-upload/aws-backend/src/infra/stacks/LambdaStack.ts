@@ -17,7 +17,6 @@ export class LambdaStack extends Stack {
   public readonly integrations: Integration[] = [];
   constructor(scope: Construct, id: string, props: LambdaStackProps) {
     super(scope, id, props);
-    console.log(props.bucketArn);
     for (let index = 0; index < props.handlers.length; index++) {
       const handler = props.handlers[index];
       if (handler.nestedHandlers?.length) {

@@ -23,7 +23,6 @@ export class ApiStack extends Stack {
 
     const api = new RestApi(this, props.id);
 
-    console.log(process.env.USER_POOL_ARN);
     const userPool = UserPool.fromUserPoolArn(this, 'UserPool', process.env.USER_POOL_ARN ?? '');
     const auth = new CognitoUserPoolsAuthorizer(this, 'upload-authorizer', {
       cognitoUserPools: [userPool],
