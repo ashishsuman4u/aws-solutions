@@ -22,7 +22,7 @@ export class S3Stack extends Stack {
       cors: [
         {
           allowedMethods: [HttpMethods.PUT, HttpMethods.HEAD, HttpMethods.GET],
-          allowedOrigins: ['http://localhost:3000'],
+          allowedOrigins: [process.env.FRONTEND_BASEURL ?? 'http://localhost:3000'],
           allowedHeaders: ['*'],
           exposedHeaders: ['Etag'],
         },

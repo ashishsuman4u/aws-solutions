@@ -4,7 +4,7 @@ import { Storage } from '../lib/storage';
 import { getApiResponse } from '../lib/common';
 
 const client = new S3Client({
-  region: 'us-east-1',
+  region: process.env.AWS_REGION,
 });
 
 const storage = new Storage(client, process.env.BUCKET_NAME ?? '');
