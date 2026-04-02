@@ -7,3 +7,11 @@ Please refrain from using the solutions as they are, as they are incomplete. The
 ## List of scenarios
 
 - [File Upload](https://github.com/ashishsuman4u/aws-solutions/tree/master/file-upload) - One of the most common use cases is managing the secure upload of small and large files to S3.
+
+## About the Author
+
+**Ashish Suman** — Solution Architect with 18+ years of experience building production systems at scale.
+
+- 🌐 Portfolio: [ashishsuman.co](https://ashishsuman.co)
+- 💼 LinkedIn: [linkedin.com/in/ashishsuman](https://linkedin.com/in/ashishsuman)
+- 🧩 Half-Baked Code Challenges: [ashishsuman.co/challenges](https://ashishsuman.co/challenges)
